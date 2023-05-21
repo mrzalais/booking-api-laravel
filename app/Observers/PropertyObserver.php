@@ -28,7 +28,7 @@ class PropertyObserver
             $result = $geocoderService->getCoordinatesForAddress($fullAddress);
 
             $property->lat = data_get($result, 'lat');
-            $property->long =  data_get($result, 'lng');
+            $property->long = data_get($result, 'lng');
         }
     }
 
