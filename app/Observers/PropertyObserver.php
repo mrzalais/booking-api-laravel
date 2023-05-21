@@ -8,9 +8,9 @@ use App\Services\GeocoderService;
 class PropertyObserver
 {
     /**
-     * Handle the Property "created" event.
+     * Handle the Property "creating" event.
      */
-    public function created(Property $property): void
+    public function creating(Property $property): void
     {
         if (auth()->check()) {
             $property->owner_id = auth()->id();
@@ -30,6 +30,14 @@ class PropertyObserver
             $property->lat = data_get($result, 'lat');
             $property->long =  data_get($result, 'lng');
         }
+    }
+
+    /**
+     * Handle the Property "created" event.
+     */
+    public function created(Property $property): void
+    {
+        //
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\City;
 use App\Models\Role;
 use App\Models\User;
 use Tests\TestCase;
@@ -24,5 +25,19 @@ class PropertiesTest extends TestCase
         $response = $this->actingAs($user)->getJson(self::URI);
 
         $response->assertStatus(403);
+    }
+
+    public function test_property_owner_can_add_property(): void
+    {
+        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $response = $this->actingAs($owner)->postJson('/api/owner/properties', [
+            'name' => 'My property',
+            'city_id' => City::value('id'),
+            'address_street' => $this->faker->streetAddress,
+            'address_postcode' => $this->faker->postcode,
+        ]);
+
+        $response->assertSuccessful();
+        $response->assertJsonFragment(['name' => 'My property']);
     }
 }
