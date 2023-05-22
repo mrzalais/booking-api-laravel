@@ -23,7 +23,7 @@ class PropertySearchController extends Controller
                     fn($query) => $query->where('country_id', $request->input('country'))
                 );
             })
-            ->when($request->input('geoObject'), function($query) use ($request) {
+            ->when($request->input('geoObject'), function ($query) use ($request) {
                 /** @var GeoObject $geoObject */
                 $geoObject = Geoobject::find($request->input('geoObject'));
                 if ($geoObject) {
@@ -37,6 +37,12 @@ class PropertySearchController extends Controller
                     )";
                     $query->whereRaw($condition);
                 }
+            })
+            ->when($request->input('adults') && $request->input('children'), function ($query) use ($request) {
+                $query->withWhereHas('apartments', function ($query) use ($request) {
+                    $query->where('capacity_adults', '>=', $request->input('adults'))
+                        ->where('capacity_children', '>=', $request->input('children'));
+                });
             })
             ->get();
     }
