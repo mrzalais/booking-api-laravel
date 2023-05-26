@@ -14,23 +14,28 @@ use Illuminate\Support\Carbon;
  * App\Models\Apartment
  *
  * @property int $id
+ * @property int|null $apartment_type_id
  * @property int $property_id
  * @property string $name
  * @property int $capacity_adults
  * @property int $capacity_children
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property int|null $size
+ * @property-read ApartmentType|null $apartment_type
  * @property-read Property $property
  * @method static ApartmentFactory factory($count = null, $state = [])
  * @method static Builder|Apartment newModelQuery()
  * @method static Builder|Apartment newQuery()
  * @method static Builder|Apartment query()
+ * @method static Builder|Apartment whereApartmentTypeId($value)
  * @method static Builder|Apartment whereCapacityAdults($value)
  * @method static Builder|Apartment whereCapacityChildren($value)
  * @method static Builder|Apartment whereCreatedAt($value)
  * @method static Builder|Apartment whereId($value)
  * @method static Builder|Apartment whereName($value)
  * @method static Builder|Apartment wherePropertyId($value)
+ * @method static Builder|Apartment whereSize($value)
  * @method static Builder|Apartment whereUpdatedAt($value)
  * @mixin Eloquent
  */
@@ -40,13 +45,20 @@ class Apartment extends Model
 
     protected $fillable = [
         'property_id',
+        'apartment_type_id',
         'name',
         'capacity_adults',
         'capacity_children',
+        'size',
     ];
 
     public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class);
+    }
+
+    public function apartment_type(): BelongsTo
+    {
+        return $this->belongsTo(ApartmentType::class);
     }
 }
