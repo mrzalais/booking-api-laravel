@@ -2,24 +2,29 @@
 
 namespace App\Models;
 
+use Database\Factories\ApartmentTypeFactory;
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\ApartmentType
  *
  * @property int $id
  * @property string $name
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|ApartmentType newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ApartmentType newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ApartmentType query()
- * @method static \Illuminate\Database\Eloquent\Builder|ApartmentType whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApartmentType whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApartmentType whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ApartmentType whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @method static Builder|ApartmentType newModelQuery()
+ * @method static Builder|ApartmentType newQuery()
+ * @method static Builder|ApartmentType query()
+ * @method static Builder|ApartmentType whereCreatedAt($value)
+ * @method static Builder|ApartmentType whereId($value)
+ * @method static Builder|ApartmentType whereName($value)
+ * @method static Builder|ApartmentType whereUpdatedAt($value)
+ * @method static ApartmentTypeFactory factory($count = null, $state = [])
+ * @mixin Eloquent
  */
 class ApartmentType extends Model
 {

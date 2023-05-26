@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\CountryFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,6 +27,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Country whereLong($value)
  * @method static Builder|Country whereName($value)
  * @method static Builder|Country whereUpdatedAt($value)
+ * @method static CountryFactory factory($count = null, $state = [])
  * @mixin Eloquent
  */
 class Country extends Model

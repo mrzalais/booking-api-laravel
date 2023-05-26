@@ -20,9 +20,9 @@ class CityFactory extends Factory
     {
         return [
             'country_id' => Country::factory()->create(),
-            'name' => fake()->city,
-            'lat' => fake()->latitude,
-            'long' => fake()->longitude,
+            'name' => $this->faker->city,
+            'lat' => $this->faker->latitude,
+            'long' => $this->faker->longitude,
         ];
     }
 }

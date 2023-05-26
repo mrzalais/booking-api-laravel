@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\CityFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,6 +31,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|City whereLong($value)
  * @method static Builder|City whereName($value)
  * @method static Builder|City whereUpdatedAt($value)
+ * @method static CityFactory factory($count = null, $state = [])
  * @mixin Eloquent
  */
 class City extends Model

@@ -21,13 +21,13 @@ class PropertyFactory extends Factory
     public function definition(): array
     {
         return [
-            'owner_id' => User::factory()->create(['role_id' => Role::ROLE_OWNER])->value('id'),
-            'name' => fake()->text(20),
-            'city_id' => City::factory()->create()->value('id'),
-            'address_street' => fake()->streetAddress,
-            'address_postcode' => fake()->postcode,
-            'lat' => fake()->latitude,
-            'long' => fake()->longitude,
+            'owner_id' => User::factory()->create(['role_id' => Role::ROLE_OWNER]),
+            'name' => $this->faker->text(20),
+            'city_id' => City::factory()->create(),
+            'address_street' => $this->faker->streetAddress,
+            'address_postcode' => $this->faker->postcode,
+            'lat' => $this->faker->latitude,
+            'long' => $this->faker->longitude,
         ];
     }
 }

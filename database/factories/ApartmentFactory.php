@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Apartment;
+use App\Models\ApartmentType;
 use App\Models\Property;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,10 +20,13 @@ class ApartmentFactory extends Factory
     public function definition(): array
     {
         return [
+            'apartment_type_id' => ApartmentType::all()->random(),
             'property_id' => Property::factory()->create(),
-            'name' => fake()->text(20),
-            'capacity_adults' => rand(1, 5),
-            'capacity_children' => rand(1, 5),
+            'name' => $this->faker->text(20),
+            'capacity_adults' => $this->faker->numberBetween(1, 4),
+            'capacity_children' => $this->faker->numberBetween(0, 4),
+            'size' => $this->faker->numberBetween(50, 200),
+            'bathrooms' => $this->faker->numberBetween(1, 3),
         ];
     }
 }

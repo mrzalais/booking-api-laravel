@@ -2,13 +2,15 @@
 
 namespace Database\Factories;
 
-use App\Models\Country;
+use App\Models\Bed;
+use App\Models\BedType;
+use App\Models\Room;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Country>
+ * @extends Factory<Bed>
  */
-class CountryFactory extends Factory
+class BedFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,9 +20,9 @@ class CountryFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->country,
-            'lat' => $this->faker->latitude,
-            'long' => $this->faker->longitude,
+            'room_id' => Room::factory()->create(),
+            'bed_type_id' => BedType::all()->random(),
+            'name' => $this->faker->name,
         ];
     }
 }

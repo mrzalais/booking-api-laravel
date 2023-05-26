@@ -49,6 +49,14 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder|User whereRoleId($value)
  * @method static Builder|User whereUpdatedAt($value)
  * @property-read UserProfile|null $profile
+ * @property string|null $display_name
+ * @property string|null $phone_number
+ * @property string|null $phone_verified_at
+ * @property string|null $photo
+ * @method static Builder|User whereDisplayName($value)
+ * @method static Builder|User wherePhoneNumber($value)
+ * @method static Builder|User wherePhoneVerifiedAt($value)
+ * @method static Builder|User wherePhoto($value)
  * @mixin Eloquent
  */
 class User extends Authenticatable
