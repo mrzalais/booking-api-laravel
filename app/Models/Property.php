@@ -3,8 +3,11 @@
 namespace App\Models;
 
 use App\Observers\PropertyObserver;
+use Database\Factories\PropertyFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,10 +17,6 @@ use Illuminate\Support\Carbon;
 /**
  * App\Models\Property
  *
- * @property-read City|null $city
- * @method static Builder|Property newModelQuery()
- * @method static Builder|Property newQuery()
- * @method static Builder|Property query()
  * @property int $id
  * @property int $owner_id
  * @property string $name
@@ -28,6 +27,14 @@ use Illuminate\Support\Carbon;
  * @property string|null $long
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Collection<int, Apartment> $apartments
+ * @property-read int|null $apartments_count
+ * @property-read City $city
+ * @property-read Attribute $address
+ * @method static PropertyFactory factory($count = null, $state = [])
+ * @method static Builder|Property newModelQuery()
+ * @method static Builder|Property newQuery()
+ * @method static Builder|Property query()
  * @method static Builder|Property whereAddressPostcode($value)
  * @method static Builder|Property whereAddressStreet($value)
  * @method static Builder|Property whereCityId($value)
@@ -69,5 +76,12 @@ class Property extends Model
     public function apartments(): HasMany
     {
         return $this->hasMany(Apartment::class);
+    }
+
+    public function address(): Attribute
+    {
+        return new Attribute(
+            fn() => implode(', ', [$this->address_street, $this->address_postcode, $this->city->name])
+        );
     }
 }

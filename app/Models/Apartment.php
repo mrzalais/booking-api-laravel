@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property int|null $size
+ * @property int $bathrooms
  * @property-read ApartmentType|null $apartment_type
  * @property-read Property $property
  * @property-read Collection<int, Room> $rooms
@@ -33,6 +34,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Apartment newQuery()
  * @method static Builder|Apartment query()
  * @method static Builder|Apartment whereApartmentTypeId($value)
+ * @method static Builder|Apartment whereBathrooms($value)
  * @method static Builder|Apartment whereCapacityAdults($value)
  * @method static Builder|Apartment whereCapacityChildren($value)
  * @method static Builder|Apartment whereCreatedAt($value)
