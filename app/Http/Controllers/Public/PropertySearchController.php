@@ -13,7 +13,12 @@ class PropertySearchController extends Controller
 {
     public function __invoke(Request $request): Collection
     {
-        return Property::with('city', 'apartments.apartment_type')
+        return Property::query()
+        ->with([
+            'city',
+            'apartments.apartment_type',
+            'apartments.rooms.beds.bed_type'
+        ])
             ->when($request->input('city'), function (Builder $query) use ($request) {
                 $query->where('city_id', $request->input('city'));
             })

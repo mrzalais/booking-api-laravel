@@ -19,5 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CitySeeder::class);
         $this->call(GeoObjectSeeder::class);
         $this->call(ApartmentTypeSeeder::class);
+        $this->call(RoomTypeSeeder::class);
+        $this->call(BedTypeSeeder::class);
     }
 }
