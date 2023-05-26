@@ -5,9 +5,11 @@ namespace App\Models;
 use Database\Factories\ApartmentFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -24,6 +26,8 @@ use Illuminate\Support\Carbon;
  * @property int|null $size
  * @property-read ApartmentType|null $apartment_type
  * @property-read Property $property
+ * @property-read Collection<int, Room> $rooms
+ * @property-read int|null $rooms_count
  * @method static ApartmentFactory factory($count = null, $state = [])
  * @method static Builder|Apartment newModelQuery()
  * @method static Builder|Apartment newQuery()
@@ -50,6 +54,7 @@ class Apartment extends Model
         'capacity_adults',
         'capacity_children',
         'size',
+        'bathrooms',
     ];
 
     public function property(): BelongsTo
@@ -60,5 +65,10 @@ class Apartment extends Model
     public function apartment_type(): BelongsTo
     {
         return $this->belongsTo(ApartmentType::class);
+    }
+
+    public function rooms(): HasMany
+    {
+        return $this->hasMany(Room::class);
     }
 }
