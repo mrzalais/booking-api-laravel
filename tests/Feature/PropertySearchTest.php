@@ -385,4 +385,46 @@ class PropertySearchTest extends TestCase
         );
     }
 
+    public function test_property_search_returns_one_best_apartment_per_property(): void
+    {
+        /** @var User $owner */
+        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+
+        /** @var City $city */
+        $city = City::factory()->create();
+
+        /** @var Property $property */
+        $property = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city->id,
+        ]);
+
+        Apartment::factory()->create([
+            'name' => 'Large apartment',
+            'property_id' => $property->id,
+            'capacity_adults' => 3,
+            'capacity_children' => 2,
+        ]);
+
+        /** @var Apartment $mediumApartment */
+        $mediumApartment = Apartment::factory()->create([
+            'name' => 'Medium apartment',
+            'property_id' => $property->id,
+            'capacity_adults' => 2,
+            'capacity_children' => 1,
+        ]);
+
+        Apartment::factory()->create([
+            'name' => 'Small apartment',
+            'property_id' => $property->id,
+            'capacity_adults' => 1,
+            'capacity_children' => 0,
+        ]);
+
+        $response = $this->getJson('/api/search?city=' . $city->id . '&adults=2&children=1');
+
+        $response->assertStatus(200);
+        $response->assertJsonCount(1, '0.apartments');
+        $response->assertJsonPath('0.apartments.0.name', $mediumApartment->name);
+    }
 }

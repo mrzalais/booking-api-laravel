@@ -7,6 +7,7 @@ use App\Http\Resources\PropertySearchResource;
 use App\Models\GeoObject;
 use App\Models\Property;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -20,16 +21,18 @@ class PropertySearchController extends Controller
             'apartments.apartment_type',
             'apartments.rooms.beds.bed_type'
         ])
-            ->when($request->input('city'), function (Builder $query) use ($request) {
+            ->when($request->input('city'), function ($query) use ($request) {
+                /** @var Builder $query */
                 $query->where('city_id', $request->input('city'));
             })
-            ->when($request->input('country'), function (Builder $query) use ($request) {
+            ->when($request->input('country'), function ($query) use ($request) {
+                /** @var Builder $query */
                 $query->whereHas(
                     'city',
                     fn($query) => $query->where('country_id', $request->input('country'))
                 );
             })
-            ->when($request->input('geoObject'), function ($query) use ($request) {
+            ->when($request->input('geoObject'), function (Builder $query) use ($request) {
                 /** @var GeoObject $geoObject */
                 $geoObject = Geoobject::find($request->input('geoObject'));
                 if ($geoObject) {
@@ -46,8 +49,13 @@ class PropertySearchController extends Controller
             })
             ->when($request->input('adults') && $request->input('children'), function ($query) use ($request) {
                 $query->withWhereHas('apartments', function ($query) use ($request) {
+                    /** @var Builder $query */
                     $query->where('capacity_adults', '>=', $request->input('adults'))
-                        ->where('capacity_children', '>=', $request->input('children'));
+                        ->where('capacity_children', '>=', $request->input('children'))
+                        ->orderBy('capacity_adults')
+                        ->orderBy('capacity_children')
+                        ->take(1);
+
                 });
             })
             ->get();
