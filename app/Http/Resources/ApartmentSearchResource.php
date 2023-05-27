@@ -15,13 +15,14 @@ class ApartmentSearchResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var Apartment $this */
+        /** @var Apartment|ApartmentSearchResource $this */
         return [
             'name' => $this->name,
             'type' => $this->apartment_type?->name,
             'size' => $this->size,
             'beds_list' => $this->bedsList,
             'bathrooms' => $this->bathrooms,
+            'facilities' => FacilityResource::collection($this->whenLoaded('facilities')),
         ];
     }
 }

@@ -7,7 +7,6 @@ use App\Http\Resources\PropertySearchResource;
 use App\Models\GeoObject;
 use App\Models\Property;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
