@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
@@ -34,6 +35,8 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Bed> $beds
  * @property-read int|null $beds_count
  * @property-read Attribute $bedsList
+ * @property-read Collection<int, Facility> $facilities
+ * @property-read int|null $facilities_count
  * @method static ApartmentFactory factory($count = null, $state = [])
  * @method static Builder|Apartment newModelQuery()
  * @method static Builder|Apartment newQuery()
@@ -82,6 +85,11 @@ class Apartment extends Model
     public function beds(): HasManyThrough
     {
         return $this->hasManyThrough(Bed::class, Room::class);
+    }
+
+    public function facilities(): BelongsToMany
+    {
+        return $this->belongsToMany(Facility::class);
     }
 
     public function bedsList(): Attribute
