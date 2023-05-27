@@ -3,11 +3,15 @@
 namespace Tests\Feature;
 
 use App\Models\Apartment;
+use App\Models\Bed;
+use App\Models\BedType;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\GeoObject;
 use App\Models\Property;
 use App\Models\Role;
+use App\Models\Room;
+use App\Models\RoomType;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -187,4 +191,198 @@ class PropertySearchTest extends TestCase
         $response->assertJsonPath('0.apartments.0.name', $largeApartment->name);
         $response->assertJsonMissing(['name' => $smallApartment->name]);
     }
+
+    public function test_bed_list_is_empty_if_no_beds(): void
+    {
+        /** @var User $owner */
+        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+
+        /** @var City $city */
+        $city = City::factory()->create();
+
+        /** @var Property $property */
+        $property = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city->id,
+        ]);
+
+        Apartment::factory()->create([
+            'name' => 'Small apartment',
+            'property_id' => $property->id,
+            'capacity_adults' => 1,
+            'capacity_children' => 0,
+        ]);
+
+        $response = $this->getJson('/api/search?city=' . $city->id);
+        $response->assertStatus(200);
+        $response->assertJsonCount(1);
+        $response->assertJsonCount(1, '0.apartments');
+        $response->assertJsonPath('0.apartments.0.beds_list', '');
+    }
+
+    public function test_bed_list_has_one_bed(): void
+    {
+        /** @var User $owner */
+        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+
+        /** @var City $city */
+        $city = City::factory()->create();
+
+        /** @var Property $property */
+        $property = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city->id,
+        ]);
+
+        /** @var Apartment $apartment */
+        $apartment = Apartment::factory()->create([
+            'name' => 'Small apartment',
+            'property_id' => $property->id,
+            'capacity_adults' => 1,
+            'capacity_children' => 0,
+        ]);
+
+        /** @var Room $room */
+        $room = Room::factory()->create([
+            'apartment_id' => $apartment->id,
+            'name' => 'Bedroom',
+        ]);
+
+        /** @var BedType $bedType */
+        $bedType = BedType::factory()->create(['name' => 'Small test bed']);
+
+        Bed::factory()->create([
+            'room_id' => $room->id,
+            'bed_type_id' => $bedType->id,
+        ]);
+
+        $response = $this->getJson('/api/search?city=' . $city->id);
+        $response->assertStatus(200);
+        $response->assertJsonPath('0.apartments.0.beds_list', '1 ' . $bedType->name);
+    }
+
+    public function test_bed_list_has_two_beds(): void
+    {
+        /** @var User $owner */
+        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+
+        /** @var City $city */
+        $city = City::factory()->create();
+
+        /** @var Property $property */
+        $property = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city->id,
+        ]);
+
+        /** @var Apartment $apartment */
+        $apartment = Apartment::factory()->create([
+            'name' => 'Small apartment',
+            'property_id' => $property->id,
+            'capacity_adults' => 1,
+            'capacity_children' => 0,
+        ]);
+
+        /** @var Room $room */
+        $room = Room::factory()->create([
+            'apartment_id' => $apartment->id,
+            'name' => 'Bedroom',
+        ]);
+
+        /** @var BedType $bedType */
+        $bedType = BedType::factory()->create(['name' => 'Small test bed']);
+
+        Bed::factory()->count(2)->create([
+            'room_id' => $room->id,
+            'bed_type_id' => $bedType->id,
+        ]);
+
+        $response = $this->getJson('/api/search?city=' . $city->id);
+        $response->assertStatus(200);
+        $response->assertJsonPath('0.apartments.0.beds_list', '2 ' . str($bedType->name)->plural());
+    }
+
+    public function test_bed_list_has_multiple_beds_within_multiple_rooms(): void
+    {
+        /** @var User $owner */
+        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+
+        /** @var City $city */
+        $city = City::factory()->create();
+
+        /** @var Property $property */
+        $property = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city->id,
+        ]);
+
+        /** @var Apartment $apartment */
+        $apartment = Apartment::factory()->create([
+            'name' => 'Small apartment',
+            'property_id' => $property->id,
+            'capacity_adults' => 1,
+            'capacity_children' => 0,
+        ]);
+
+        /** @var Room $room */
+        $room = Room::factory()->create([
+            'apartment_id' => $apartment->id,
+            'name' => 'Bedroom',
+        ]);
+
+        /** @var BedType $bedType */
+        $bedType = BedType::factory()->create(['name' => 'Small test bed']);
+
+        Bed::factory()->count(2)->create([
+            'room_id' => $room->id,
+            'bed_type_id' => $bedType->id,
+        ]);
+
+        /** @var Room $secondRoom */
+        $secondRoom = Room::factory()->create([
+            'apartment_id' => $apartment->id,
+            'name' => 'Living room',
+        ]);
+
+        $response = $this->getJson('/api/search?city=' . $city->id);
+        $response->assertStatus(200);
+        $response->assertJsonPath('0.apartments.0.beds_list', '2 ' . str($bedType->name)->plural());
+
+        Bed::factory()->create([
+            'room_id' => $secondRoom->id,
+            'bed_type_id' => $bedType->id,
+        ]);
+
+        $response = $this->getJson('/api/search?city=' . $city->id);
+        $response->assertStatus(200);
+        $response->assertJsonPath('0.apartments.0.beds_list', '3 ' . str($bedType->name)->plural());
+
+        /** @var BedType $secondBedType */
+        $secondBedType = BedType::factory()->create(['name' => 'Medium size test bed']);
+
+        Bed::factory()->create([
+            'room_id' => $secondRoom->id,
+            'bed_type_id' => $secondBedType->id,
+        ]);
+
+        $response = $this->getJson('/api/search?city=' . $city->id);
+        $response->assertStatus(200);
+        $response->assertJsonPath(
+            path: '0.apartments.0.beds_list',
+            expect: '4 beds (3 ' . str($bedType->name)->plural() . ', 1 ' . $secondBedType->name . ')'
+        );
+
+        Bed::factory()->create([
+            'room_id' => $secondRoom->id,
+            'bed_type_id' => $secondBedType->id,
+        ]);
+
+        $response = $this->getJson('/api/search?city=' . $city->id);
+        $response->assertStatus(200);
+        $response->assertJsonPath(
+            path: '0.apartments.0.beds_list',
+            expect: '5 beds (3 ' . str($bedType->name)->plural() . ', 2 ' . str($secondBedType->name)->plural() . ')'
+        );
+    }
+
 }

@@ -5,11 +5,13 @@ namespace App\Models;
 use Database\Factories\ApartmentFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
 
 /**
@@ -29,6 +31,9 @@ use Illuminate\Support\Carbon;
  * @property-read Property $property
  * @property-read Collection<int, Room> $rooms
  * @property-read int|null $rooms_count
+ * @property-read Collection<int, Bed> $beds
+ * @property-read int|null $beds_count
+ * @property-read Attribute $bedsList
  * @method static ApartmentFactory factory($count = null, $state = [])
  * @method static Builder|Apartment newModelQuery()
  * @method static Builder|Apartment newQuery()
@@ -72,5 +77,32 @@ class Apartment extends Model
     public function rooms(): HasMany
     {
         return $this->hasMany(Room::class);
+    }
+
+    public function beds(): HasManyThrough
+    {
+        return $this->hasManyThrough(Bed::class, Room::class);
+    }
+
+    public function bedsList(): Attribute
+    {
+        $allBeds = $this->beds;
+        $bedsByType = $allBeds->groupBy('bed_type.name');
+        $bedsList = '';
+
+        if ($bedsByType->count() == 1) {
+            $bedsList = $allBeds->count() . ' ' . str($bedsByType->keys()[0])->plural($allBeds->count());
+        } else if ($bedsByType->count() > 1) {
+            $bedsList = $allBeds->count() . ' ' . str('bed')->plural($allBeds->count());
+            $bedsListArray = [];
+            foreach ($bedsByType as $bedType => $beds) {
+                $bedsListArray[] = $beds->count() . ' ' . str($bedType)->plural($beds->count());
+            }
+            $bedsList .= ' ('.implode(', ' , $bedsListArray) .')';
+        }
+
+        return new Attribute(
+            get: fn () => $bedsList
+        );
     }
 }
