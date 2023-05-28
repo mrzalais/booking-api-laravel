@@ -37,6 +37,8 @@ use Illuminate\Support\Carbon;
  * @property-read Attribute $bedsList
  * @property-read Collection<int, Facility> $facilities
  * @property-read int|null $facilities_count
+ * @property-read Collection $facility_categories
+ * @property-read Attribute $beds_list
  * @method static ApartmentFactory factory($count = null, $state = [])
  * @method static Builder|Apartment newModelQuery()
  * @method static Builder|Apartment newQuery()
