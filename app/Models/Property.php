@@ -13,8 +13,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
+use Spatie\Image\Exceptions\InvalidManipulation;
+use Spatie\MediaLibrary\Conversions\Conversion;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\FileAdder;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * App\Models\Property
@@ -47,12 +55,14 @@ use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
  * @method static Builder|Property whereName($value)
  * @method static Builder|Property whereOwnerId($value)
  * @method static Builder|Property whereUpdatedAt($value)
+ * @property-read int|null $facilities_count
  * @mixin Eloquent
  */
-class Property extends Model
+class Property extends Model implements HasMedia
 {
     use HasFactory;
     use HasEagerLimit;
+    use InteractsWithMedia;
 
     protected $fillable = [
         'owner_id',
@@ -91,5 +101,13 @@ class Property extends Model
         return new Attribute(
             fn() => implode(', ', [$this->address_street, $this->address_postcode, $this->city->name])
         );
+    }
+
+    /**
+     * @throws InvalidManipulation
+     */
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('thumbnail')->width(800);
     }
 }
