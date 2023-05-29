@@ -4,15 +4,15 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PropertySearchResource;
+use App\Models\Facility;
 use App\Models\GeoObject;
 use App\Models\Property;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class PropertySearchController extends Controller
 {
-    public function __invoke(Request $request): AnonymousResourceCollection
+    public function __invoke(Request $request): array
     {
         $properties = Property::query()
         ->with([
@@ -57,8 +57,26 @@ class PropertySearchController extends Controller
 
                 });
             })
+            ->when($request->input('facilities'), function($query) use ($request) {
+                $query->whereHas('facilities', function($query) use ($request) {
+                    /** @var Builder $query */
+                    $query->whereIn('facilities.id', $request->input('facilities'));
+                });
+            })
             ->get();
 
-        return PropertySearchResource::collection($properties);
+        $facilities = Facility::query()
+            ->withCount(['properties' => function ($property) use ($properties) {
+                $property->whereIn('id', $properties->pluck('id'));
+            }])
+            ->get()
+            ->where('properties_count', '>', 0)
+            ->sortByDesc('properties_count')
+            ->pluck('properties_count', 'name');
+
+        return [
+            'properties' => PropertySearchResource::collection($properties),
+            'facilities' => $facilities,
+        ];
     }
 }

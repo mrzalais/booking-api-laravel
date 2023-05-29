@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -33,6 +34,11 @@ class Facility extends Model
     use HasFactory;
 
     protected $fillable = ['category_id', 'name'];
+
+    public function properties(): BelongsToMany
+    {
+        return $this->belongsToMany(Property::class);
+    }
 
     public function category(): BelongsTo
     {

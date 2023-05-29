@@ -13,6 +13,7 @@ class FacilitySeeder extends Seeder
      */
     public function run(): void
     {
+        //Apartment facilities
         $facilities = [
             [
                 'category_id' => FacilityCategoryEnum::Bedroom,
@@ -73,6 +74,20 @@ class FacilitySeeder extends Seeder
                 'category_id' => data_get($facility, 'category_id'),
                 'name' => data_get($facility, 'name'),
             ]);
+        }
+
+        //Property facilities
+
+        $facilityNames = [
+            'Family rooms',
+            'Free WiFi',
+            'Parking',
+            'Pets allowed',
+            'Swimming pool',
+        ];
+
+        foreach ($facilityNames as $facilityName) {
+            Facility::create(['name' => $facilityName]);
         }
     }
 }
