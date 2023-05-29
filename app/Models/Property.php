@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
 
 /**
  * App\Models\Property
@@ -51,6 +52,7 @@ use Illuminate\Support\Carbon;
 class Property extends Model
 {
     use HasFactory;
+    use HasEagerLimit;
 
     protected $fillable = [
         'owner_id',

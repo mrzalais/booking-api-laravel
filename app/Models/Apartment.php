@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
+use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
 
 /**
  * App\Models\Apartment
@@ -58,6 +59,7 @@ use Illuminate\Support\Carbon;
 class Apartment extends Model
 {
     use HasFactory;
+    use HasEagerLimit;
 
     protected $fillable = [
         'property_id',
