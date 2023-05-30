@@ -13,16 +13,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
 use Spatie\Image\Exceptions\InvalidManipulation;
-use Spatie\MediaLibrary\Conversions\Conversion;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\FileAdder;
+use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * App\Models\Property
@@ -56,6 +53,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * @method static Builder|Property whereOwnerId($value)
  * @method static Builder|Property whereUpdatedAt($value)
  * @property-read int|null $facilities_count
+ * @property-read Collection<int, Facility> $facilities
+ * @property-read MediaCollection<int, Media> $media
+ * @property-read int|null $media_count
  * @mixin Eloquent
  */
 class Property extends Model implements HasMedia

@@ -18,7 +18,9 @@ class PropertySearchController extends Controller
         ->with([
             'city',
             'apartments.apartment_type',
-            'apartments.rooms.beds.bed_type'
+            'apartments.rooms.beds.bed_type',
+            'facilities',
+            'media' => fn($query) => $query->orderBy('order_column'),
         ])
             ->when($request->input('city'), function ($query) use ($request) {
                 /** @var Builder $query */

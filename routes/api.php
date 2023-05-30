@@ -15,12 +15,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('auth/register', RegisterController::class);
-//
-//Route::post('/tokens/create', function (Request $request) {
-//    $token = User::query()->where(['id' => 2])->first()->createToken($request->input('token_name'));
-//
-//    return ['token' => $token->plainTextToken];
-//});
 
 Route::middleware('auth:sanctum')->group(function() {
     Route::prefix('owner')->group(function () {
@@ -28,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::post('properties', [OwnerPropertyController::class, 'store']);
 
         Route::post('properties/{property}/photos', [PropertyPhotoController::class, 'store']);
+        Route::post('properties/{property}/photos/{photo}/reorder/{newPosition}', [PropertyPhotoController::class, 'reorder']);
     });
 
     Route::prefix('user')->group(function () {
