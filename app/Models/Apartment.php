@@ -54,6 +54,8 @@ use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
  * @method static Builder|Apartment wherePropertyId($value)
  * @method static Builder|Apartment whereSize($value)
  * @method static Builder|Apartment whereUpdatedAt($value)
+ * @property-read Collection<int, ApartmentPrice> $prices
+ * @property-read int|null $prices_count
  * @mixin Eloquent
  */
 class Apartment extends Model
@@ -96,6 +98,33 @@ class Apartment extends Model
         return $this->belongsToMany(Facility::class);
     }
 
+    public function prices(): HasMany
+    {
+        return $this->hasMany(ApartmentPrice::class);
+    }
+
+    public function calculatePriceForDates(Carbon|string|null $startDate, Carbon|string|null $endDate): int
+    {
+        // Convert to Carbon if not already
+        if (!$startDate instanceof Carbon) {
+            $startDate = Carbon::parse($startDate)->startOfDay();
+        }
+        if (!$endDate instanceof Carbon) {
+            $endDate = Carbon::parse($endDate)->endOfDay();
+        }
+
+        $cost = 0;
+
+        while ($startDate->lte($endDate)) {
+            $cost += $this->prices->where(function (ApartmentPrice $price) use ($startDate) {
+                return $price->start_date->lte($startDate) && $price->end_date->gte($startDate);
+            })->value('price');
+            $startDate->addDay();
+        }
+
+        return $cost;
+    }
+
     public function bedsList(): Attribute
     {
         $allBeds = $this->beds;
@@ -104,17 +133,17 @@ class Apartment extends Model
 
         if ($bedsByType->count() == 1) {
             $bedsList = $allBeds->count() . ' ' . str($bedsByType->keys()[0])->plural($allBeds->count());
-        } else if ($bedsByType->count() > 1) {
+        } elseif ($bedsByType->count() > 1) {
             $bedsList = $allBeds->count() . ' ' . str('bed')->plural($allBeds->count());
             $bedsListArray = [];
             foreach ($bedsByType as $bedType => $beds) {
                 $bedsListArray[] = $beds->count() . ' ' . str($bedType)->plural($beds->count());
             }
-            $bedsList .= ' ('.implode(', ' , $bedsListArray) .')';
+            $bedsList .= ' (' . implode(', ', $bedsListArray) . ')';
         }
 
         return new Attribute(
-            get: fn () => $bedsList
+            get: fn() => $bedsList
         );
     }
 }

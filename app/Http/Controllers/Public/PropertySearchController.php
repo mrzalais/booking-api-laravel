@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PropertySearchResource;
+use App\Models\ApartmentPrice;
 use App\Models\Facility;
 use App\Models\GeoObject;
 use App\Models\Property;
@@ -15,13 +16,20 @@ class PropertySearchController extends Controller
     public function __invoke(Request $request): array
     {
         $properties = Property::query()
-        ->with([
-            'city',
-            'apartments.apartment_type',
-            'apartments.rooms.beds.bed_type',
-            'facilities',
-            'media' => fn($query) => $query->orderBy('order_column'),
-        ])
+            ->with([
+                'city',
+                'apartments.apartment_type',
+                'apartments.rooms.beds.bed_type',
+                'apartments.prices' => function ($query) use ($request) {
+                    /** @var Builder|ApartmentPrice $query */
+                    $query->validForRange([
+                        $request->input('start_date') ?? now()->addDay()->toDateString(),
+                        $request->input('end_date') ?? now()->addDays(2)->toDateString(),
+                    ]);
+                },
+                'facilities',
+                'media' => fn($query) => $query->orderBy('order_column'),
+            ])
             ->when($request->input('city'), function ($query) use ($request) {
                 /** @var Builder $query */
                 $query->where('city_id', $request->input('city'));
@@ -56,21 +64,32 @@ class PropertySearchController extends Controller
                         ->orderBy('capacity_adults')
                         ->orderBy('capacity_children')
                         ->take(1);
-
                 });
             })
-            ->when($request->input('facilities'), function($query) use ($request) {
-                $query->whereHas('facilities', function($query) use ($request) {
+            ->when($request->input('facilities'), function ($query) use ($request) {
+                $query->whereHas('facilities', function ($query) use ($request) {
                     /** @var Builder $query */
                     $query->whereIn('facilities.id', $request->input('facilities'));
+                });
+            })
+            ->when($request->input('price_from'), function ($query) use ($request) {
+                $query->whereHas('apartments.prices', function ($query) use ($request) {
+                    $query->where('price', '>=', $request->input('price_from'));
+                });
+            })
+            ->when($request->input('price_to'), function ($query) use ($request) {
+                $query->whereHas('apartments.prices', function ($query) use ($request) {
+                    $query->where('price', '<=', $request->input('price_to'));
                 });
             })
             ->get();
 
         $facilities = Facility::query()
-            ->withCount(['properties' => function ($property) use ($properties) {
-                $property->whereIn('id', $properties->pluck('id'));
-            }])
+            ->withCount([
+                'properties' => function ($property) use ($properties) {
+                    $property->whereIn('id', $properties->pluck('id'));
+                }
+            ])
             ->get()
             ->where('properties_count', '>', 0)
             ->sortByDesc('properties_count')
