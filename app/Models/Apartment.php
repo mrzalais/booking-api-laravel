@@ -56,6 +56,8 @@ use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
  * @method static Builder|Apartment whereUpdatedAt($value)
  * @property-read Collection<int, ApartmentPrice> $prices
  * @property-read int|null $prices_count
+ * @property-read Collection<int, Booking> $bookings
+ * @property-read int|null $bookings_count
  * @mixin Eloquent
  */
 class Apartment extends Model
@@ -96,6 +98,11 @@ class Apartment extends Model
     public function facilities(): BelongsToMany
     {
         return $this->belongsToMany(Facility::class);
+    }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
     }
 
     public function prices(): HasMany

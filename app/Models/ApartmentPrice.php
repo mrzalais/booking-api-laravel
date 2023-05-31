@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\ValidForRange;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,11 +30,12 @@ use Illuminate\Support\Carbon;
  * @method static Builder|ApartmentPrice wherePrice($value)
  * @method static Builder|ApartmentPrice whereStartDate($value)
  * @method static Builder|ApartmentPrice whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class ApartmentPrice extends Model
 {
     use HasFactory;
+    use ValidForRange;
 
     protected $fillable = ['apartment_id', 'start_date', 'end_date', 'price'];
 
@@ -40,28 +43,4 @@ class ApartmentPrice extends Model
         'start_date' => 'date',
         'end_date' => 'date',
     ];
-
-    public function scopeValidForRange($query, array $range = []): Builder
-    {
-        /** @var Builder $query */
-        $query = $query->where(function ($query) use ($range) {
-            return $query
-                // Covers outer bounds
-                ->where(function ($query) use ($range) {
-                    $query->where('start_date', '>=', reset($range))->where('end_date', '<=', end($range));
-                })
-                // Covers left and right bound
-                ->orWhere(function ($query) use ($range) {
-                    $query->whereBetween('start_date', $range)->orWhereBetween('end_date', $range);
-                })
-                // Covers inner bounds
-                ->orWhere(function ($query) use ($range) {
-                    $query->where('start_date', '<=', reset($range))
-                        ->where('end_date', '>=', end($range));
-                });
-        });
-
-        return $query;
-    }
-
 }
