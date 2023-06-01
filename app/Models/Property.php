@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
 use Spatie\Image\Exceptions\InvalidManipulation;
 use Spatie\MediaLibrary\HasMedia;
@@ -56,6 +57,8 @@ use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
  * @property-read Collection<int, Facility> $facilities
  * @property-read MediaCollection<int, Media> $media
  * @property-read int|null $media_count
+ * @property-read int|null $bookings_count
+ * @property-read int|null $bookings_avg_rating
  * @mixin Eloquent
  */
 class Property extends Model implements HasMedia
@@ -94,6 +97,11 @@ class Property extends Model implements HasMedia
     public function facilities(): BelongsToMany
     {
         return $this->belongsToMany(Facility::class);
+    }
+
+    public function bookings(): HasManyThrough
+    {
+        return $this->hasManyThrough(Booking::class, Apartment::class);
     }
 
     public function address(): Attribute

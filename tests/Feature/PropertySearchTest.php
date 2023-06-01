@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Apartment;
 use App\Models\Bed;
 use App\Models\BedType;
+use App\Models\Booking;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Facility;
@@ -12,7 +13,6 @@ use App\Models\GeoObject;
 use App\Models\Property;
 use App\Models\Role;
 use App\Models\Room;
-use App\Models\RoomType;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -578,5 +578,76 @@ class PropertySearchTest extends TestCase
         $response = $this->getJson('/api/search?city=' . $city->id . '&adults=2&children=1&price_from=80&price_to=100');
         $response->assertStatus(200);
         $response->assertJsonCount(0, 'properties');
+    }
+
+    public function test_properties_show_correct_rating_and_ordered_by_it()
+    {
+        /** @var User $owner */
+        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+
+        /** @var City $city */
+        $city = City::factory()->create();
+
+        /** @var Property $property */
+        $property = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city->id,
+        ]);
+        /** @var Apartment $apartment1 */
+        $apartment1 = Apartment::factory()->create([
+            'name' => 'Cheap apartment',
+            'property_id' => $property->id,
+            'capacity_adults' => 2,
+            'capacity_children' => 1,
+        ]);
+        /** @var Property $property2 */
+        $property2 = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city->id,
+        ]);
+        /** @var Apartment $apartment2 */
+        $apartment2 = Apartment::factory()->create([
+            'name' => 'Mid size apartment',
+            'property_id' => $property2->id,
+            'capacity_adults' => 2,
+            'capacity_children' => 1,
+        ]);
+        /** @var User $user1 */
+        $user1 = User::factory()->create(['role_id' => Role::ROLE_USER]);
+        /** @var User $user2 */
+        $user2 = User::factory()->create(['role_id' => Role::ROLE_USER]);
+        Booking::create([
+            'apartment_id' => $apartment1->id,
+            'user_id' => $user1->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+            'guests_adults' => 1,
+            'guests_children' => 0,
+            'rating' => 7
+        ]);
+        Booking::create([
+            'apartment_id' => $apartment2->id,
+            'user_id' => $user1->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+            'guests_adults' => 1,
+            'guests_children' => 0,
+            'rating' => 9
+        ]);
+        Booking::create([
+            'apartment_id' => $apartment2->id,
+            'user_id' => $user2->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+            'guests_adults' => 1,
+            'guests_children' => 0,
+            'rating' => 7
+        ]);
+
+        $response = $this->getJson('/api/search?city=' . $city->id . '&adults=2&children=1');
+        $response->assertStatus(200);
+        $response->assertJsonCount(2, 'properties');
+        $this->assertEquals(8, $response->json('properties')[0]['avg_rating']);
+        $this->assertEquals(7, $response->json('properties')[1]['avg_rating']);
     }
 }

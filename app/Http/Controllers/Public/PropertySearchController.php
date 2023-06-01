@@ -30,6 +30,7 @@ class PropertySearchController extends Controller
                 'facilities',
                 'media' => fn($query) => $query->orderBy('order_column'),
             ])
+            ->withAvg('bookings', 'rating')
             ->when($request->input('city'), function ($query) use ($request) {
                 /** @var Builder $query */
                 $query->where('city_id', $request->input('city'));
@@ -82,6 +83,7 @@ class PropertySearchController extends Controller
                     $query->where('price', '<=', $request->input('price_to'));
                 });
             })
+            ->orderBy('bookings_avg_rating', 'desc')
             ->get();
 
         $facilities = Facility::query()

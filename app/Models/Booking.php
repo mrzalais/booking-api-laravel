@@ -43,6 +43,11 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Booking whereUserId($value)
  * @method static Builder|Booking withTrashed()
  * @method static Builder|Booking withoutTrashed()
+ * @method static Builder|Booking validForRange(array $range = [])
+ * @property int|null $rating
+ * @property string|null $review_comment
+ * @method static Builder|Booking whereRating($value)
+ * @method static Builder|Booking whereReviewComment($value)
  * @mixin Eloquent
  */
 class Booking extends Model
@@ -58,7 +63,9 @@ class Booking extends Model
         'end_date',
         'guests_adults',
         'guests_children',
-        'total_price'
+        'total_price',
+        'rating',
+        'review_comment',
     ];
 
     public function apartment(): BelongsTo

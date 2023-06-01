@@ -52,7 +52,7 @@ class BookingsTest extends TestCase
         ]);
     }
 
-    public function test_user_can_book_apartment_successfully_but_not_twice()
+    public function test_user_can_book_apartment_successfully_but_not_twice(): void
     {
         $user = User::factory()->create(['role_id' => Role::ROLE_USER]);
         $apartment = $this->create_apartment();
@@ -77,7 +77,7 @@ class BookingsTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function test_user_can_get_only_their_bookings()
+    public function test_user_can_get_only_their_bookings(): void
     {
         /** @var User $user1 */
         $user1 = User::factory()->create(['role_id' => Role::ROLE_USER]);
@@ -114,7 +114,7 @@ class BookingsTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_user_can_cancel_their_booking_but_still_view_it()
+    public function test_user_can_cancel_their_booking_but_still_view_it(): void
     {
         /** @var User $user1 */
         $user1 = User::factory()->create(['role_id' => Role::ROLE_USER]);
@@ -144,5 +144,44 @@ class BookingsTest extends TestCase
         $response = $this->actingAs($user1)->getJson(self::URI . $booking->id);
         $response->assertStatus(200);
         $response->assertJsonFragment(['cancelled_at' => now()->toDateString()]);
+    }
+
+    public function test_user_can_post_rating_for_their_booking(): void
+    {
+        /** @var User $user1 */
+        $user1 = User::factory()->create(['role_id' => Role::ROLE_USER]);
+        /** @var User $user2 */
+        $user2 = User::factory()->create(['role_id' => Role::ROLE_USER]);
+        $apartment = $this->create_apartment();
+        $booking = Booking::create([
+            'apartment_id' => $apartment->id,
+            'user_id' => $user1->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+            'guests_adults' => 1,
+            'guests_children' => 0,
+        ]);
+
+        $response = $this->actingAs($user2)->putJson(self::URI . $booking->id, []);
+        $response->assertStatus(403);
+
+        $response = $this->actingAs($user1)->putJson(self::URI . $booking->id, [
+            'rating' => 11
+        ]);
+        $response->assertStatus(422);
+
+        $response = $this->actingAs($user1)->putJson(self::URI . $booking->id, [
+            'rating' => 10,
+            'review_comment' => 'Too short comment.'
+        ]);
+        $response->assertStatus(422);
+
+        $correctData = [
+            'rating' => 10,
+            'review_comment' => 'Comment with a good length to be accepted.'
+        ];
+        $response = $this->actingAs($user1)->putJson(self::URI . $booking->id, $correctData);
+        $response->assertStatus(200);
+        $response->assertJsonFragment($correctData);
     }
 }
