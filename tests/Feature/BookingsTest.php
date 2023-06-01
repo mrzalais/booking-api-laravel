@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Apartment;
+use App\Models\Booking;
 use App\Models\City;
 use App\Models\Property;
 use App\Models\Role;
@@ -11,7 +12,7 @@ use Tests\TestCase;
 
 class BookingsTest extends TestCase
 {
-    private const URI = '/api/user/bookings';
+    private const URI = '/api/user/bookings/';
 
     public function test_user_has_access_to_bookings_feature(): void
     {
@@ -74,5 +75,74 @@ class BookingsTest extends TestCase
         $bookingParameters['guests_adults'] = 5;
         $response = $this->actingAs($user)->postJson(self::URI, $bookingParameters);
         $response->assertStatus(422);
+    }
+
+    public function test_user_can_get_only_their_bookings()
+    {
+        /** @var User $user1 */
+        $user1 = User::factory()->create(['role_id' => Role::ROLE_USER]);
+        /** @var User $user2 */
+        $user2 = User::factory()->create(['role_id' => Role::ROLE_USER]);
+        $apartment = $this->create_apartment();
+        $booking1 = Booking::create([
+            'apartment_id' => $apartment->id,
+            'user_id' => $user1->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+            'guests_adults' => 1,
+            'guests_children' => 0,
+        ]);
+        $booking2 = Booking::create([
+            'apartment_id' => $apartment->id,
+            'user_id' => $user2->id,
+            'start_date' => now()->addDay(3),
+            'end_date' => now()->addDays(4),
+            'guests_adults' => 2,
+            'guests_children' => 1,
+        ]);
+
+        $response = $this->actingAs($user1)->getJson(self::URI);
+        $response->assertStatus(200);
+        $response->assertJsonCount(1);
+        $response->assertJsonFragment(['guests_adults' => 1]);
+
+        $response = $this->actingAs($user1)->getJson(self::URI . $booking1->id);
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['guests_adults' => 1]);
+
+        $response = $this->actingAs($user1)->getJson(self::URI . $booking2->id);
+        $response->assertStatus(403);
+    }
+
+    public function test_user_can_cancel_their_booking_but_still_view_it()
+    {
+        /** @var User $user1 */
+        $user1 = User::factory()->create(['role_id' => Role::ROLE_USER]);
+        /** @var User $user2 */
+        $user2 = User::factory()->create(['role_id' => Role::ROLE_USER]);
+        $apartment = $this->create_apartment();
+        $booking = Booking::create([
+            'apartment_id' => $apartment->id,
+            'user_id' => $user1->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+            'guests_adults' => 1,
+            'guests_children' => 0,
+        ]);
+
+        $response = $this->actingAs($user2)->deleteJson(self::URI . $booking->id);
+        $response->assertStatus(403);
+
+        $response = $this->actingAs($user1)->deleteJson(self::URI . $booking->id);
+        $response->assertStatus(204);
+
+        $response = $this->actingAs($user1)->getJson(self::URI);
+        $response->assertStatus(200);
+        $response->assertJsonCount(1);
+        $response->assertJsonFragment(['cancelled_at' => now()->toDateString()]);
+
+        $response = $this->actingAs($user1)->getJson(self::URI . $booking->id);
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['cancelled_at' => now()->toDateString()]);
     }
 }
