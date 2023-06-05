@@ -4,11 +4,14 @@ namespace Database\Seeders;
 
 use Database\Seeders\Performance;
 use Illuminate\Database\Seeder;
+use Laravel\Telescope\Telescope;
 
 class PerformanceTestingSeeder extends Seeder
 {
     public function run(): void
     {
+        Telescope::stopRecording();
+
         $this->call([
             RoleSeeder::class,
             AdminUserSeeder::class,

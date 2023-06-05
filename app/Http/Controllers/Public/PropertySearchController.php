@@ -19,7 +19,7 @@ class PropertySearchController extends Controller
             ->with([
                 'city',
                 'apartments.apartment_type',
-                'apartments.rooms.beds.bed_type',
+                'apartments.beds.bed_type',
                 'apartments.prices' => function ($query) use ($request) {
                     /** @var Builder|ApartmentPrice $query */
                     $query->validForRange([
@@ -30,7 +30,6 @@ class PropertySearchController extends Controller
                 'facilities',
                 'media' => fn($query) => $query->orderBy('order_column'),
             ])
-            ->withAvg('bookings', 'rating')
             ->when($request->input('city'), function ($query) use ($request) {
                 /** @var Builder $query */
                 $query->where('city_id', $request->input('city'));
@@ -82,8 +81,7 @@ class PropertySearchController extends Controller
                 $query->whereHas('apartments.prices', function ($query) use ($request) {
                     $query->where('price', '<=', $request->input('price_to'));
                 });
-            })
-            ->orderBy('bookings_avg_rating', 'desc');
+            });
 
         $facilities = Facility::query()
             ->withCount([
@@ -96,7 +94,10 @@ class PropertySearchController extends Controller
             ->sortByDesc('properties_count')
             ->pluck('properties_count', 'name');
 
-        $properties = $propertyQuery->paginate(10)->withQueryString();
+        $properties = $propertyQuery
+            ->orderBy('bookings_avg_rating', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         return [
             'properties' => PropertySearchResource::collection($properties)
