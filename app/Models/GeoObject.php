@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\GeoObjectFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,6 +29,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|GeoObject whereLong($value)
  * @method static Builder|GeoObject whereName($value)
  * @method static Builder|GeoObject whereUpdatedAt($value)
+ * @method static GeoObjectFactory factory($count = null, $state = [])
  * @mixin Eloquent
  */
 class GeoObject extends Model

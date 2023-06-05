@@ -15,7 +15,7 @@ class PropertySearchController extends Controller
 {
     public function __invoke(Request $request): array
     {
-        $properties = Property::query()
+        $propertyQuery = Property::query()
             ->with([
                 'city',
                 'apartments.apartment_type',
@@ -83,13 +83,12 @@ class PropertySearchController extends Controller
                     $query->where('price', '<=', $request->input('price_to'));
                 });
             })
-            ->orderBy('bookings_avg_rating', 'desc')
-            ->get();
+            ->orderBy('bookings_avg_rating', 'desc');
 
         $facilities = Facility::query()
             ->withCount([
-                'properties' => function ($property) use ($properties) {
-                    $property->whereIn('id', $properties->pluck('id'));
+                'properties' => function ($property) use ($propertyQuery) {
+                    $property->whereIn('id', $propertyQuery->pluck('id'));
                 }
             ])
             ->get()
@@ -97,8 +96,12 @@ class PropertySearchController extends Controller
             ->sortByDesc('properties_count')
             ->pluck('properties_count', 'name');
 
+        $properties = $propertyQuery->paginate(10)->withQueryString();
+
         return [
-            'properties' => PropertySearchResource::collection($properties),
+            'properties' => PropertySearchResource::collection($properties)
+                ->response()
+                ->getData(true),
             'facilities' => $facilities,
         ];
     }
