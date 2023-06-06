@@ -24,7 +24,7 @@ class BookingsTest extends TestCase
 
     public function test_property_owner_does_not_have_access_to_bookings_feature(): void
     {
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
         $response = $this->actingAs($owner)->getJson(self::URI);
 
         $response->assertStatus(403);
@@ -33,7 +33,7 @@ class BookingsTest extends TestCase
     private function create_apartment(): Apartment
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();

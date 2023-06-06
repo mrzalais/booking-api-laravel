@@ -21,7 +21,7 @@ class PropertySearchTest extends TestCase
     public function test_property_search_by_city_returns_correct_results(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $cityA */
         $cityA = City::factory()->create();
@@ -52,7 +52,7 @@ class PropertySearchTest extends TestCase
     public function test_property_search_by_country_returns_correct_results(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var Country $countryA */
         $countryA = Country::factory()->create();
@@ -91,7 +91,7 @@ class PropertySearchTest extends TestCase
     public function test_property_search_by_geo_object_returns_correct_results(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
         /** @var City $city */
         $city = City::factory()->create();
         /** @var GeoObject $geoObject */
@@ -123,7 +123,7 @@ class PropertySearchTest extends TestCase
     public function test_property_search_by_capacity_returns_correct_results(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
         /** @var City $city */
         $city = City::factory()->create();
 
@@ -161,7 +161,7 @@ class PropertySearchTest extends TestCase
     public function test_property_search_by_capacity_returns_only_suitable_apartments(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
         /** @var City $city */
         $city = City::factory()->create();
 
@@ -197,7 +197,7 @@ class PropertySearchTest extends TestCase
     public function test_bed_list_is_empty_if_no_beds(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();
@@ -225,7 +225,7 @@ class PropertySearchTest extends TestCase
     public function test_bed_list_has_one_bed(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();
@@ -266,7 +266,7 @@ class PropertySearchTest extends TestCase
     public function test_bed_list_has_two_beds(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();
@@ -307,7 +307,7 @@ class PropertySearchTest extends TestCase
     public function test_bed_list_has_multiple_beds_within_multiple_rooms(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();
@@ -390,7 +390,7 @@ class PropertySearchTest extends TestCase
     public function test_property_search_returns_one_best_apartment_per_property(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();
@@ -457,7 +457,7 @@ class PropertySearchTest extends TestCase
     public function test_property_search_filters_by_facilities(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();
@@ -516,7 +516,7 @@ class PropertySearchTest extends TestCase
     public function test_property_search_filters_by_price()
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();
@@ -584,7 +584,7 @@ class PropertySearchTest extends TestCase
     public function test_properties_show_correct_rating_and_ordered_by_it()
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();

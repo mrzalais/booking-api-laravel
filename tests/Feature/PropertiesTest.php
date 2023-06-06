@@ -23,7 +23,7 @@ class PropertiesTest extends TestCase
 
     public function test_property_owner_has_access_to_properties_feature(): void
     {
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
         $response = $this->actingAs($owner)->getJson(self::URI);
 
         $response->assertStatus(200);
@@ -50,7 +50,7 @@ class PropertiesTest extends TestCase
             return $mock;
         });
 
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
         $response = $this->actingAs($owner)->postJson(self::URI, [
             'name' => 'My property',
             'city_id' => City::value('id'),

@@ -7,7 +7,6 @@ use App\Models\City;
 use App\Models\Facility;
 use App\Models\FacilityCategory;
 use App\Models\Property;
-use App\Models\Role;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -16,7 +15,7 @@ class ApartmentShowTest extends TestCase
     public function test_apartment_show_loads_apartment_with_facilities(): void
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();

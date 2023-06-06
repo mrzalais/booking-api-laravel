@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\City;
 use App\Models\Media;
 use App\Models\Property;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as SpatieMedia;
@@ -21,7 +20,7 @@ class PropertiesPhotosTest extends TestCase
         Storage::fake();
 
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();

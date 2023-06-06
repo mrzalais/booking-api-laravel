@@ -21,7 +21,7 @@ class PropertyFactory extends Factory
     public function definition(): array
     {
         return [
-            'owner_id' => User::factory()->create(['role_id' => Role::ROLE_OWNER]),
+            'owner_id' => User::factory()->owner()->create(),
             'name' => $this->faker->text(20),
             'city_id' => City::factory()->create(),
             'address_street' => $this->faker->streetAddress,
@@ -29,5 +29,14 @@ class PropertyFactory extends Factory
             'lat' => $this->faker->latitude,
             'long' => $this->faker->longitude,
         ];
+    }
+
+    public function withImages($count = 2): PropertyFactory
+    {
+        return $this->afterCreating(function ($property) use ($count) {
+            for ($i = 0; $i < $count; $i++) {
+                $property->addMedia(fake()->image())->toMediaCollection('images');
+            }
+        });
     }
 }

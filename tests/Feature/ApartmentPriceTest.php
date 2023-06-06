@@ -6,7 +6,6 @@ use App\Models\Apartment;
 use App\Models\ApartmentPrice;
 use App\Models\City;
 use App\Models\Property;
-use App\Models\Role;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -15,7 +14,7 @@ class ApartmentPriceTest extends TestCase
     private function create_apartment(): Apartment
     {
         /** @var User $owner */
-        $owner = User::factory()->create(['role_id' => Role::ROLE_OWNER]);
+        $owner = User::factory()->owner()->create();
 
         /** @var City $city */
         $city = City::factory()->create();
