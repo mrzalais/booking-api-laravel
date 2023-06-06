@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Apartment;
+use App\Services\PricingService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -23,7 +24,11 @@ class ApartmentSearchResource extends JsonResource
             'beds_list' => $this->bedsList,
             'bathrooms' => $this->bathrooms,
             'facilities' => FacilityResource::collection($this->whenLoaded('facilities')),
-            'price' => $this->calculatePriceForDates($request->input('start_date'), $request->input('end_date'))
+            'price' => (new PricingService())->calculateApartmentPriceForDates(
+                $this->prices,
+                $request->input('start_date'),
+                $request->input('end_date')
+            )
         ];
     }
 }
