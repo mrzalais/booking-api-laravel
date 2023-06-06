@@ -13,9 +13,21 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
+/**
+ * @group User
+ * @subgroup Bookings
+ */
 class BookingController extends Controller
 {
     /**
+     * List of user bookings
+     *
+     * [Returns preview list of all user bookings]
+     *
+     * @authenticated
+     *
+     * @response {"id":1,"apartment_name":"Fugiat saepe sed.: Apartment","start_date":"2023-05-11","end_date":"2023-05-12","guests_adults":1,"guests_children":0,"total_price":0,"cancelled_at":null,"rating":null,"review_comment":null}
+     *
      * @throws AuthorizationException
      */
     public function index(): AnonymousResourceCollection
@@ -34,6 +46,15 @@ class BookingController extends Controller
         return BookingResource::collection($bookings);
     }
 
+    /**
+     * Create new booking
+     *
+     * [Creates new booking for authenticated user]
+     *
+     * @authenticated
+     *
+     * @response 201 {"id":1,"apartment_name":"Hic consequatur qui.: Apartment","start_date":"2023-05-11 08:00:51","end_date":"2023-05-12 08:00:51","guests_adults":2,"guests_children":1,"total_price":0,"cancelled_at":null,"rating":null,"review_comment":null}
+     */
     public function store(StoreBookingRequest $request): BookingResource
     {
         /** @var User $user */
@@ -44,6 +65,14 @@ class BookingController extends Controller
     }
 
     /**
+     * View booking
+     *
+     * [Returns details about a booking]
+     *
+     * @authenticated
+     *
+     * @response {"id":1,"apartment_name":"Hic consequatur qui.: Apartment","start_date":"2023-05-11 08:00:51","end_date":"2023-05-12 08:00:51","guests_adults":2,"guests_children":1,"total_price":0,"cancelled_at":null,"rating":null,"review_comment":null}
+     *
      * @throws AuthorizationException
      */
     public function show(Booking $booking): BookingResource
@@ -58,6 +87,14 @@ class BookingController extends Controller
     }
 
     /**
+     * Delete booking
+     *
+     * [Deletes a booking]
+     *
+     * @authenticated
+     *
+     * @response {}
+     *
      * @throws AuthorizationException
      */
     public function destroy(Booking $booking): Response
@@ -73,6 +110,15 @@ class BookingController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * Update existing booking rating
+     *
+     * [Updates booking with new details]
+     *
+     * @authenticated
+     *
+     * @response {"id":1,"apartment_name":"Hic consequatur qui.: Apartment","start_date":"2023-05-11 08:00:51","end_date":"2023-05-12 08:00:51","guests_adults":2,"guests_children":1,"total_price":0,"cancelled_at":null,"rating":null,"review_comment":null}
+     */
     public function update(Booking $booking, UpdateBookingRequest $request): BookingResource
     {
         if ($booking->user_id != auth()->id()) {
